@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { StudentForm } from "@/services/types";
-import { useCreateStudent } from "@/services/mutations";
+import { StudentForm } from "../services/types";
+import { useCreateStudent } from "../services/mutations";
 import {
   Dialog,
   DialogContent,
@@ -11,25 +11,35 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useState } from "react";
+import { toast } from "sonner";
 
 function AddNewStudent() {
+  const [IsDialogOpen, setIsDialogOpen] = useState(false);
   const createStudentMutation = useCreateStudent();
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<StudentForm>();
 
   const onSubmit = (data: StudentForm) => {
-    createStudentMutation.mutate(data);
+    createStudentMutation.mutate(data, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        reset();
+        toast("New Student Added");
+      },
+    });
   };
   return (
     <div>
-      <Dialog>
+      <Dialog open={IsDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button>Add Student</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>Add Student</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
