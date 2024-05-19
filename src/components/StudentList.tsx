@@ -1,11 +1,23 @@
 import { StudentData } from "@/services/types";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useEffect, useState } from "react";
 import { Edit, Eye, Search, Trash, Loader } from "lucide-react";
 import { Button } from "./ui/button";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const pagination = true;
 const paginationPageSize = 25;
@@ -27,6 +39,7 @@ type DisplayData = {
 
 const ActionButtons = () => {
   const [status, setStatus] = useState(false);
+
   return (
     <>
       <Button
@@ -49,14 +62,32 @@ const ActionButtons = () => {
       >
         <Edit />
       </Button>
-      <Button
-        variant="destructive"
-        onClick={() => {
-          console.log("delete");
-        }}
-      >
-        <Trash />
-      </Button>
+
+      <AlertDialog>
+        <AlertDialogTrigger>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              console.log("delete");
+            }}
+          >
+            <Trash />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently student and
+              remove data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {}}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

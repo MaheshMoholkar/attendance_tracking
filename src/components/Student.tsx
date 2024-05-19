@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import AddNewStudent from "./AddNewStudent";
+import ModifyStudent from "./ModifyStudent";
 import { StudentData } from "@/services/types";
 import { useGetStudents } from "@/services/queries";
 import StudentList from "./StudentList";
@@ -15,7 +15,7 @@ function Student() {
     <div className="p-7">
       <h2 className="font-bold text-2xl flex justify-between items-center text-gray-700">
         Students
-        <AddNewStudent />
+        <ModifyStudent action="add" name="Add Student" />
       </h2>
       <StudentList studentList={studentList} />
     </div>

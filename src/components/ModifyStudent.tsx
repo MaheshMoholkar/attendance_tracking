@@ -2,7 +2,9 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StudentData } from "../services/types";
-import { useCreateStudent } from "../services/mutations";
+import { useCreateStudent, useModifyStudent } from "../services/mutations";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -11,12 +13,17 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
-import { toast } from "sonner";
 
-function AddNewStudent() {
+type ModifyStudentProps = {
+  name: string;
+  action: "add" | "view" | "modify";
+  studentData?: StudentData;
+};
+
+function ModifyStudent({ name, action, studentData }: ModifyStudentProps) {
   const [IsDialogOpen, setIsDialogOpen] = useState(false);
   const createStudentMutation = useCreateStudent();
+  const modifyStudentMutation = useModifyStudent();
 
   const {
     register,
@@ -24,31 +31,65 @@ function AddNewStudent() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<StudentData>();
+  } = useForm<StudentData>({ defaultValues: studentData });
 
   const onSubmit = (data: StudentData) => {
     data = {
       ...data,
       rollno: parseInt(data.rollno.toString(), 10),
     };
-    createStudentMutation.mutate(data, {
-      onSuccess: (data) => {
-        console.log(data);
-        setIsDialogOpen(false);
-        reset();
-        toast("New Student Added");
-      },
-    });
+
+    if (action === "add") {
+      createStudentMutation.mutate(data, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          reset();
+          toast("New Student Added");
+        },
+      });
+    } else if (action === "modify") {
+      modifyStudentMutation.mutate(data, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          reset();
+          toast("Student Details Updated");
+        },
+      });
+    }
+  };
+  const renderSubmitButton = () => {
+    switch (action) {
+      case "add":
+        return "Add";
+      case "view":
+        return "Close";
+      case "modify":
+        return "Update";
+      default:
+        return "Submit";
+    }
+  };
+  const renderTitle = () => {
+    switch (action) {
+      case "add":
+        return "Enter Student Details";
+      case "view":
+        return "View Student Details";
+      case "modify":
+        return "Modify Student Details";
+      default:
+        return "Student Details";
+    }
   };
   return (
     <div>
       <Dialog open={IsDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(false)}>Add Student</Button>
+          <Button onClick={() => setIsDialogOpen(!IsDialogOpen)}>{name}</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Enter Student Details</DialogTitle>
+            <DialogTitle>{renderTitle()}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="gap-2 flex flex-col">
@@ -95,7 +136,7 @@ function AddNewStudent() {
             </div>
             <DialogFooter>
               <div className="flex gap-2 items-center justify-end mt-3">
-                <Button type="submit">Add</Button>
+                <Button type="submit">{renderSubmitButton()}</Button>
               </div>
             </DialogFooter>
           </form>
@@ -105,4 +146,4 @@ function AddNewStudent() {
   );
 }
 
-export default AddNewStudent;
+export default ModifyStudent;
