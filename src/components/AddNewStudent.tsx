@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { StudentForm } from "../services/types";
+import { StudentData } from "../services/types";
 import { useCreateStudent } from "../services/mutations";
 import {
   Dialog,
@@ -24,11 +24,16 @@ function AddNewStudent() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<StudentForm>();
+  } = useForm<StudentData>();
 
-  const onSubmit = (data: StudentForm) => {
+  const onSubmit = (data: StudentData) => {
+    data = {
+      ...data,
+      rollno: parseInt(data.rollno.toString(), 10),
+    };
     createStudentMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log(data);
         setIsDialogOpen(false);
         reset();
         toast("New Student Added");
@@ -61,8 +66,12 @@ function AddNewStudent() {
               />
             </div>
             <div className="py-1 gap-1 flex flex-col">
+              <label>Rollno</label>
+              <Input {...register("rollno", { required: true })} />
+            </div>
+            <div className="py-1 gap-1 flex flex-col">
               <label>Email</label>
-              <Input placeholder="johndoe@gmail.com" {...register("email")} />
+              <Input placeholder="example@gmail.com" {...register("email")} />
             </div>
             <div className="flex flex-col py-1 gap-1">
               <label>Select Class</label>
