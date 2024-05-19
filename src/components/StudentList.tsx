@@ -2,7 +2,7 @@ import { StudentData } from "@/services/types";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
 import { useEffect, useState } from "react";
-import { Edit, Eye, Search, Trash, Loader } from "lucide-react";
+import { Edit, Eye, Search, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import ModifyStudent from "./ModifyStudent";
 
 const pagination = true;
 const paginationPageSize = 25;
@@ -37,27 +38,29 @@ type DisplayData = {
   actions?: any;
 };
 
-const ActionButtons = () => {
-  const [status, setStatus] = useState(false);
+const ActionButtons = (props: any) => {
+  const handleAction = (action: string, studentData?: DisplayData) => {
+    if (action === "modify") {
+      props.setModifyDialogProps({ action: "modify", studentData });
+    } else if (action === "view") {
+      props.setModifyDialogProps({ action: "view", studentData });
+    }
+  };
 
   return (
     <>
       <Button
         variant="ghost"
         onClick={() => {
-          setStatus(true);
+          handleAction("view", props.data);
         }}
       >
-        {status == false ? (
-          <Eye />
-        ) : (
-          <Loader className="mr-2 h-4 w-4 animate-spin" />
-        )}
+        <Eye />
       </Button>
       <Button
         variant="link"
         onClick={() => {
-          console.log("edit");
+          handleAction("modify", props.data);
         }}
       >
         <Edit />
@@ -65,12 +68,7 @@ const ActionButtons = () => {
 
       <AlertDialog>
         <AlertDialogTrigger>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              console.log("delete");
-            }}
-          >
+          <Button variant="destructive">
             <Trash />
           </Button>
         </AlertDialogTrigger>
@@ -84,7 +82,13 @@ const ActionButtons = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {}}>Continue</AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => {
+                handleAction("delete", props.data);
+              }}
+            >
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -93,6 +97,10 @@ const ActionButtons = () => {
 };
 
 function StudentList({ studentList }: StudentListProps) {
+  const [modifyDialogProps, setModifyDialogProps] = useState<{
+    action: "view" | "modify";
+    studentData?: DisplayData;
+  } | null>(null);
   const colDefs: ColDef<DisplayData>[] = [
     { field: "rollno", flex: 1 },
     { field: "firstName", flex: 1 },
@@ -110,10 +118,14 @@ function StudentList({ studentList }: StudentListProps) {
       valueFormatter: (p) => p.value.toUpperCase(),
     },
     { field: "email", flex: 2 },
-    // { field: "edit", cellRenderer: EditButton, flex: 2 / 3 },
     {
       field: "actions",
-      cellRenderer: ActionButtons,
+      cellRenderer: (props: any) => (
+        <ActionButtons
+          data={props.data}
+          setModifyDialogProps={setModifyDialogProps}
+        />
+      ),
       flex: 2,
       cellStyle: () => {
         return { borderColor: "transparent" };
@@ -156,6 +168,13 @@ function StudentList({ studentList }: StudentListProps) {
           paginationPageSizeSelector={paginationPageSizeSelector}
         />
       </div>
+      {modifyDialogProps && (
+        <ModifyStudent
+          action={modifyDialogProps.action}
+          studentData={modifyDialogProps.studentData}
+          onClose={() => setModifyDialogProps(null)}
+        />
+      )}
     </>
   );
 }

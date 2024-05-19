@@ -15,13 +15,15 @@ import {
 } from "@/components/ui/dialog";
 
 type ModifyStudentProps = {
-  name: string;
-  action: "add" | "view" | "modify";
+  action?: "view" | "modify";
   studentData?: StudentData;
+  onClose?: () => void;
 };
 
-function ModifyStudent({ name, action, studentData }: ModifyStudentProps) {
-  const [IsDialogOpen, setIsDialogOpen] = useState(false);
+function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
+  const [IsDialogOpen, setIsDialogOpen] = useState(
+    action === "view" || action === "modify"
+  );
   const createStudentMutation = useCreateStudent();
   const modifyStudentMutation = useModifyStudent();
 
@@ -38,16 +40,7 @@ function ModifyStudent({ name, action, studentData }: ModifyStudentProps) {
       ...data,
       rollno: parseInt(data.rollno.toString(), 10),
     };
-
-    if (action === "add") {
-      createStudentMutation.mutate(data, {
-        onSuccess: () => {
-          setIsDialogOpen(false);
-          reset();
-          toast("New Student Added");
-        },
-      });
-    } else if (action === "modify") {
+    if (action === "modify") {
       modifyStudentMutation.mutate(data, {
         onSuccess: () => {
           setIsDialogOpen(false);
@@ -55,41 +48,49 @@ function ModifyStudent({ name, action, studentData }: ModifyStudentProps) {
           toast("Student Details Updated");
         },
       });
+    } else {
+      createStudentMutation.mutate(data, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          reset();
+          toast("New Student Added");
+        },
+      });
     }
   };
   const renderSubmitButton = () => {
     switch (action) {
-      case "add":
-        return "Add";
       case "view":
         return "Close";
       case "modify":
         return "Update";
       default:
-        return "Submit";
+        return "Add";
     }
   };
   const renderTitle = () => {
     switch (action) {
-      case "add":
-        return "Enter Student Details";
       case "view":
         return "View Student Details";
       case "modify":
         return "Modify Student Details";
       default:
-        return "Student Details";
+        return "Enter Student Details";
     }
   };
   return (
     <div>
-      <Dialog open={IsDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={IsDialogOpen} onOpenChange={onClose}>
         <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(!IsDialogOpen)}>{name}</Button>
+          <Button onClick={() => setIsDialogOpen(!IsDialogOpen)}>
+            Add Student
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{renderTitle()}</DialogTitle>
+            <DialogTitle>
+              {action ? renderTitle() : "Enter Student Details"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="gap-2 flex flex-col">
@@ -136,7 +137,9 @@ function ModifyStudent({ name, action, studentData }: ModifyStudentProps) {
             </div>
             <DialogFooter>
               <div className="flex gap-2 items-center justify-end mt-3">
-                <Button type="submit">{renderSubmitButton()}</Button>
+                {action !== "view" && (
+                  <Button type="submit">{renderSubmitButton()}</Button>
+                )}
               </div>
             </DialogFooter>
           </form>
