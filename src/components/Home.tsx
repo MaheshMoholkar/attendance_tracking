@@ -1,6 +1,6 @@
+import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import SideNav from "./SideNav";
-import Student from "./Student";
 
 function Home() {
   return (
@@ -10,7 +10,7 @@ function Home() {
       </div>
       <div className="md:ml-64">
         <Header />
-        <Student />
+        <Outlet />
       </div>
     </div>
   );

@@ -1,11 +1,21 @@
-import './App.css'
-import Home from './components/Home'
+import "./App.css";
+import Home from "./components/Home";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Student from "./components/Student";
+import Dashboard from "./components/Dashboard";
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+    children: [
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "students", element: <Student /> },
+    ],
+  },
+]);
 function App() {
-
-  return (
-    <Home />
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
