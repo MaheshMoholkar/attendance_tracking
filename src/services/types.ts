@@ -1,7 +1,8 @@
-export type StudentForm = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    class: string;
-    division: string;
-  }
+export type StudentData = {
+  firstName: string;
+  lastName: string;
+  rollno: number;
+  email: string;
+  class: string;
+  division: string;
+};
