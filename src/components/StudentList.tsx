@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import ModifyStudent from "./ModifyStudent";
+import { useDeleteStudent } from "@/services/mutations";
 
 const pagination = true;
 const paginationPageSize = 25;
@@ -33,17 +34,25 @@ type DisplayData = {
   lastName: string;
   rollno: number;
   email: string;
-  class: string;
+  className: string;
   division: string;
+  year: number;
   actions?: any;
 };
 
 const ActionButtons = (props: any) => {
-  const handleAction = (action: string, studentData?: DisplayData) => {
+  const deleteStudentMutation = useDeleteStudent();
+  const handleAction = async (action: string, studentData?: DisplayData) => {
     if (action === "modify") {
       props.setModifyDialogProps({ action: "modify", studentData });
     } else if (action === "view") {
       props.setModifyDialogProps({ action: "view", studentData });
+    } else if (action === "delete") {
+      if (studentData != undefined) {
+        await deleteStudentMutation.mutateAsync(
+          parseInt(studentData.rollno.toString())
+        );
+      }
     }
   };
 
@@ -106,7 +115,7 @@ function StudentList({ studentList }: StudentListProps) {
     { field: "firstName", flex: 1 },
     { field: "lastName", flex: 1 },
     {
-      field: "class",
+      field: "className",
       flex: 1,
       filter: true,
       valueFormatter: (p) => p.value.toUpperCase(),
@@ -117,7 +126,10 @@ function StudentList({ studentList }: StudentListProps) {
       filter: true,
       valueFormatter: (p) => p.value.toUpperCase(),
     },
-    { field: "email", flex: 2 },
+    {
+      field: "year",
+      flex: 1,
+    },
     {
       field: "actions",
       cellRenderer: (props: any) => (

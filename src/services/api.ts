@@ -19,3 +19,7 @@ export const createStudent = async (data: StudentData) => {
 export const modifyStudent = async (data: StudentData) => {
   return await axiosInstance.put("api/v1/student", data);
 };
+
+export const deleteStudent = async (id: number) => {
+  return await axiosInstance.delete(`api/v1/student?rollno=${id}`);
+};
