@@ -14,10 +14,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+type ActionType = "view" | "modify" | undefined;
+
 type ModifyStudentProps = {
-  action?: "view" | "modify";
+  action?: ActionType;
   studentData?: StudentData;
-  onClose?: () => void;
+  onClose?: () => void | void;
 };
 
 function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
@@ -43,7 +45,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
     if (action === "modify") {
       modifyStudentMutation.mutate(data, {
         onSuccess: () => {
-          setIsDialogOpen(false);
+          onClose && onClose();
           reset();
           toast("Student Details Updated");
         },
@@ -51,7 +53,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
     } else {
       createStudentMutation.mutate(data, {
         onSuccess: () => {
-          setIsDialogOpen(false);
+          handleCloseDialog();
           reset();
           toast("New Student Added");
         },
@@ -60,10 +62,8 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   };
   const renderSubmitButton = () => {
     switch (action) {
-      case "view":
-        return "Close";
       case "modify":
-        return "Update";
+        return "Modify";
       default:
         return "Add";
     }
@@ -78,14 +78,28 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
         return "Enter Student Details";
     }
   };
+  const dialogProps =
+    action === "view" || action === "modify"
+      ? { open: IsDialogOpen, onOpenChange: onClose }
+      : {
+          open: IsDialogOpen,
+          onOpenChange: () => setIsDialogOpen(!IsDialogOpen),
+        };
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
   return (
     <div>
-      <Dialog open={IsDialogOpen} onOpenChange={onClose}>
-        <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(!IsDialogOpen)}>
-            Add Student
-          </Button>
-        </DialogTrigger>
+      <Dialog {...dialogProps}>
+        {action === undefined && (
+          <DialogTrigger asChild>
+            <Button onClick={handleOpenDialog}>Add Student</Button>
+          </DialogTrigger>
+        )}
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -135,13 +149,13 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
                 <option value="b">B</option>
               </select>
             </div>
-            <DialogFooter>
-              <div className="flex gap-2 items-center justify-end mt-3">
-                {action !== "view" && (
+            {action !== "view" && (
+              <DialogFooter>
+                <div className="flex gap-2 items-center justify-end mt-3">
                   <Button type="submit">{renderSubmitButton()}</Button>
-                )}
-              </div>
-            </DialogFooter>
+                </div>
+              </DialogFooter>
+            )}
           </form>
         </DialogContent>
       </Dialog>
