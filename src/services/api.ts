@@ -4,6 +4,10 @@ import { StudentData } from "./types";
 const BASE_URL = "http://localhost:5000";
 const axiosInstance = axios.create({ baseURL: BASE_URL });
 
+export const getClassInfo = async () => {
+  return (await axiosInstance.get("api/v1/class-info")).data;
+};
+
 export const getStudents = async () => {
   return (await axiosInstance.get("api/v1/students")).data;
 };
