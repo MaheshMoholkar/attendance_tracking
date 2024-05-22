@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Student from "./components/Student";
 import Dashboard from "./components/Dashboard";
+import Attendance from "./components/Attendance";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,7 @@ const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <Dashboard /> },
       { path: "students", element: <Student /> },
+      { path: "attendance", element: <Attendance /> },
     ],
   },
 ]);

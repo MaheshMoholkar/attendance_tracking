@@ -7,10 +7,10 @@ import moment from "moment/moment";
 import { Calendar } from "./ui/calendar";
 
 type MonthSelectorProps = {
-  selectedMonth: (newMonth: Date) => void;
+  setSelectedMonth: (newMonth: Date) => void;
 };
 
-function MonthSelector({ selectedMonth }: MonthSelectorProps) {
+function MonthSelector({ setSelectedMonth }: MonthSelectorProps) {
   const today = new Date();
   const nextMonth = addMonths(today, 0);
   const [month, setMonth] = useState(nextMonth);
@@ -18,12 +18,12 @@ function MonthSelector({ selectedMonth }: MonthSelectorProps) {
     <>
       <div>
         <Popover>
-          <PopoverTrigger>
+          <PopoverTrigger asChild>
             <Button
               variant="outline"
               className="flex gap-2 items-center text-slate-500"
             >
-              <CalendarDays h-5 w-5 />
+              <CalendarDays className="h-5 w-5" />
               {moment(month).format("MMM YYYY")}
             </Button>
           </PopoverTrigger>
@@ -32,7 +32,7 @@ function MonthSelector({ selectedMonth }: MonthSelectorProps) {
               mode="single"
               month={month}
               onMonthChange={(value) => {
-                selectedMonth(value);
+                setSelectedMonth(value);
                 setMonth(value);
               }}
               className="flex flex-1 justify-center"

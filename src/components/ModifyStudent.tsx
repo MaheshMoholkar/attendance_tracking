@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClassInfo, StudentData } from "../services/types";
 import { useCreateStudent, useModifyStudent } from "../services/mutations";
-import { SetStateAction, useEffect, useState } from "react";
+import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -25,7 +25,9 @@ type ModifyStudentProps = {
 
 function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   const [classInfo, setClassInfo] = useState<ClassInfo[]>();
-  const [selectedClass, setSelectedClass] = useState<string | undefined>();
+  const [selectedClass, setSelectedClass] = useState<string | undefined>(
+    undefined
+  );
 
   const [IsDialogOpen, setIsDialogOpen] = useState(
     action === "view" || action === "modify"
@@ -45,7 +47,6 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
 
   useEffect(() => {
     setClassInfo(getClassInfoQuery.data);
-    setSelectedClass(classInfo?.at(0)?.className);
   });
 
   const onSubmit = (data: StudentData) => {
@@ -75,18 +76,20 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   const firstName = watch("firstName");
   const lastName = watch("lastName");
   const email = watch("email");
+  const className = watch("className");
   const year = watch("year") | new Date().getFullYear();
 
   useEffect(() => {
     setValue("firstName", firstName?.trim());
     setValue("lastName", lastName?.trim());
     setValue("email", email?.trim());
+    // if (action != "view") {
+    setSelectedClass(className);
+    // }
     setValue("year", year);
   }, [firstName, lastName, email, setValue]);
-  const handleClassChange = (event: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setSelectedClass(event.target.value?.toString);
+  const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedClass(event.target.value);
   };
   const renderSubmitButton = () => {
     switch (action) {

@@ -1,23 +1,45 @@
-import { useGetClassInfo } from "@/services/queries";
-import { ClassData } from "@/services/types";
-import { useEffect, useState } from "react";
+import { ClassInfo } from "@/services/types";
+import { ChangeEvent } from "react";
 
-function ClassSelector() {
-  const [classes, setClasses] = useState<ClassData[]>([]);
-  const getClassesQuery = useGetClassInfo();
-
-  useEffect(() => {
-    setClasses(getClassesQuery.data);
-  }, [classes]);
-
+type ClassSelectorProps = {
+  selectedClass: string;
+  selectedDivision: string;
+  handleClassChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  handleDivisionChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  classes: ClassInfo[];
+  divisions: string[];
+};
+function ClassSelector({
+  selectedClass,
+  selectedDivision,
+  handleClassChange,
+  handleDivisionChange,
+  classes,
+  divisions,
+}: ClassSelectorProps) {
   return (
     <>
-      <div>
-        <select className="p-2 border rounded-lg">
+      <div className="flex items-center gap-2">
+        <label>Class:</label>
+        <select
+          className="p-2 border rounded-lg"
+          value={selectedClass}
+          onChange={handleClassChange}
+        >
           {classes.map((value, index) => (
             <option key={index} value={value.className}>
               {value.className.toUpperCase()}
             </option>
+          ))}
+        </select>
+        <label>Division:</label>
+        <select
+          className="p-2 border rounded-lg"
+          value={selectedDivision}
+          onChange={handleDivisionChange}
+        >
+          {divisions.map((division, index) => (
+            <option key={index}>{division.toUpperCase()}</option>
           ))}
         </select>
       </div>
