@@ -4,12 +4,18 @@ import MonthSelector from "./MonthSelector";
 import { Button } from "./ui/button";
 import { useGetClassInfo } from "@/services/queries";
 import { ClassInfo } from "@/services/types";
+import AttendanceList from "./AttendanceList";
+import moment from "moment/moment";
 
 function Attendance() {
   const [classes, setClasses] = useState<ClassInfo[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedDivision, setSelectedDivision] = useState<string>("");
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [month, setMonth] = useState<string>(
+    moment(selectedMonth).format("MM")
+  );
+
   const [divisions, setDivisions] = useState<string[]>([]);
   const getClassesQuery = useGetClassInfo();
 
@@ -41,7 +47,8 @@ function Attendance() {
   };
 
   const handleSearch = () => {
-    console.log(selectedMonth, selectedClass, selectedDivision);
+    const month = moment(selectedMonth).format("MM");
+    setMonth(month);
   };
 
   return (
@@ -60,6 +67,9 @@ function Attendance() {
             handleDivisionChange={handleDivisionChange}
           />
           <Button onClick={handleSearch}>Search</Button>
+        </div>
+        <div>
+          <AttendanceList selectedMonth={parseInt(month)} selectedYear={2024} />
         </div>
       </div>
     </>
