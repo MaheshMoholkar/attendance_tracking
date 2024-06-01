@@ -1,9 +1,14 @@
 import "./App.css";
 import Home from "./components/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Student from "./components/Student";
-import Dashboard from "./components/Dashboard";
-import Attendance from "./components/Attendance";
+import { ThemeProvider } from "@mui/material/styles";
+
+import Student from "./pages/Student";
+import Dashboard from "./pages/Dashboard";
+import Attendance from "./pages/Attendance";
+import Login from "./pages/Login";
+import theme from "./config/AppTheme";
+import Loader from "./components/Loader";
 
 const router = createBrowserRouter([
   {
@@ -15,9 +20,15 @@ const router = createBrowserRouter([
       { path: "attendance", element: <Attendance /> },
     ],
   },
+  { path: "login", element: <Login /> },
 ]);
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider theme={theme}>
+      <RouterProvider router={router} />
+      <Loader />
+    </ThemeProvider>
+  );
 }
 
 export default App;

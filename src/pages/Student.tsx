@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { StudentData } from "@/services/types";
 import { useGetStudents } from "@/services/queries";
-import StudentList from "./StudentList";
-import AddStudent from "./AddStudent";
+import StudentList from "../components/StudentList";
+import AddStudent from "../components/AddStudent";
 
 function Student() {
   const [studentList, setStudentList] = useState<StudentData[]>([]);

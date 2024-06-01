@@ -1,10 +1,10 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import ClassSelector from "./ClassSelector";
-import MonthSelector from "./MonthSelector";
-import { Button } from "./ui/button";
+import ClassSelector from "../components/ClassSelector";
+import MonthSelector from "../components/MonthSelector";
+import { Button } from "../components/ui/button";
 import { useGetClassInfo } from "@/services/queries";
 import { ClassInfo } from "@/services/types";
-import AttendanceList from "./AttendanceList";
+import AttendanceList from "../components/AttendanceList";
 import moment from "moment/moment";
 
 function Attendance() {
