@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClassInfo, StudentData } from "../services/types";
-import { useCreateStudent, useModifyStudent } from "../services/mutations";
+import { useCreateStudent } from "../services/mutations";
 import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -15,28 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import { useGetClassInfo } from "@/services/queries";
 
-type ActionType = "view" | "modify" | undefined;
-
-type ModifyStudentProps = {
-  action?: ActionType;
-  studentData?: StudentData;
-  onClose?: () => void | void;
-};
-
-function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
+function AddStudent() {
   const [classInfo, setClassInfo] = useState<ClassInfo[]>();
-  const [selectedClass, setSelectedClass] = useState<string | undefined>(
-    studentData?.className
-  );
-  const [selectedDivision, setSelectedDivision] = useState<string | undefined>(
-    studentData?.division
-  );
+  const [selectedClass, setSelectedClass] = useState<string | undefined>();
+  const [selectedDivision, setSelectedDivision] = useState<
+    string | undefined
+  >();
+  const [IsDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const [IsDialogOpen, setIsDialogOpen] = useState(
-    action === "view" || action === "modify"
-  );
   const createStudentMutation = useCreateStudent();
-  const modifyStudentMutation = useModifyStudent();
   const getClassInfoQuery = useGetClassInfo();
 
   const {
@@ -46,20 +33,14 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<StudentData>({ defaultValues: studentData });
+  } = useForm<StudentData>();
 
   useEffect(() => {
     setClassInfo(getClassInfoQuery.data);
+    if (selectedClass == undefined) {
+      setSelectedClass(classInfo?.at(0)?.className);
+    }
   });
-
-  const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedClass(event.target.value);
-    setSelectedDivision(undefined);
-  };
-
-  const handleDivisionChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDivision(event.target.value);
-  };
 
   const onSubmit = (data: StudentData) => {
     data = {
@@ -67,64 +48,27 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
       rollno: parseInt(data.rollno.toString(), 10),
       year: parseInt(data.year.toString(), 10),
     };
-    if (action === "modify") {
-      modifyStudentMutation.mutate(data, {
-        onSuccess: (data) => {
-          console.log(data);
-          onClose && onClose();
-          reset();
-          toast("Student Details Updated");
-        },
-      });
-    } else {
-      createStudentMutation.mutate(data, {
-        onSuccess: () => {
-          handleCloseDialog();
-          reset();
-          toast("New Student Added");
-        },
-      });
-    }
+
+    createStudentMutation.mutate(data, {
+      onSuccess: () => {
+        handleCloseDialog();
+        reset();
+        toast("New Student Added");
+      },
+    });
   };
   const firstName = watch("firstName");
   const lastName = watch("lastName");
   const email = watch("email");
-  const className = watch("className");
   const year = watch("year") | new Date().getFullYear();
 
   useEffect(() => {
     setValue("firstName", firstName?.trim());
     setValue("lastName", lastName?.trim());
     setValue("email", email?.trim());
-    setSelectedClass(className);
     setValue("year", year);
   }, [firstName, lastName, email, setValue]);
 
-  const renderSubmitButton = () => {
-    switch (action) {
-      case "modify":
-        return "Modify";
-      default:
-        return "Add";
-    }
-  };
-  const renderTitle = () => {
-    switch (action) {
-      case "view":
-        return "View Student Details";
-      case "modify":
-        return "Modify Student Details";
-      default:
-        return "Enter Student Details";
-    }
-  };
-  const dialogProps =
-    action === "view" || action === "modify"
-      ? { open: IsDialogOpen, onOpenChange: onClose }
-      : {
-          open: IsDialogOpen,
-          onOpenChange: () => setIsDialogOpen(!IsDialogOpen),
-        };
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
@@ -132,19 +76,27 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
+
+  const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedClass(event.target.value);
+  };
+
+  const handleDivisionChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDivision(event.target.value);
+  };
+
   return (
     <div>
-      <Dialog {...dialogProps}>
-        {action === undefined && (
-          <DialogTrigger asChild>
-            <Button onClick={handleOpenDialog}>Add Student</Button>
-          </DialogTrigger>
-        )}
+      <Dialog
+        open={IsDialogOpen}
+        onOpenChange={() => setIsDialogOpen(!IsDialogOpen)}
+      >
+        <DialogTrigger asChild>
+          <Button onClick={handleOpenDialog}>Add Student</Button>
+        </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {action ? renderTitle() : "Enter Student Details"}
-            </DialogTitle>
+            <DialogTitle>Enter Student Details</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="gap-2 flex flex-col ">
@@ -152,8 +104,6 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <Input
                 placeholder="John"
                 {...register("firstName", { required: true })}
-                disabled={action == "view"}
-                className="disabled:opacity-75"
               />
             </div>
             <div className="py-1 gap-1 flex flex-col">
@@ -161,26 +111,15 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <Input
                 placeholder="Doe"
                 {...register("lastName", { required: true })}
-                disabled={action == "view"}
-                className="disabled:opacity-75"
               />
             </div>
             <div className="py-1 gap-1 flex flex-col">
               <label>Rollno</label>
-              <Input
-                {...register("rollno", { required: true })}
-                disabled={action == "view"}
-                className="disabled:opacity-75"
-              />
+              <Input {...register("rollno", { required: true })} />
             </div>
             <div className="py-1 gap-1 flex flex-col">
               <label>Email</label>
-              <Input
-                placeholder="example@gmail.com"
-                {...register("email")}
-                disabled={action == "view"}
-                className="disabled:opacity-75"
-              />
+              <Input placeholder="example@gmail.com" {...register("email")} />
             </div>
             <div className="flex flex-col py-1 gap-1">
               <label>Select Class</label>
@@ -188,7 +127,6 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
                 className="p-3 border rounded-lg disabled:opacity-75"
                 {...register("className", { required: true })}
                 onChange={handleClassChange}
-                disabled={action == "view"}
               >
                 {classInfo?.map((data) => (
                   <option key={data.className} value={data.className}>
@@ -204,7 +142,6 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
                 {...register("division", { required: true })}
                 onChange={handleDivisionChange}
                 value={selectedDivision}
-                disabled={action == "view"}
               >
                 {selectedClass &&
                   classInfo?.find((data) => data.className === selectedClass)
@@ -224,17 +161,13 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <Input
                 type="number"
                 {...register("year", { required: true, min: 2000, max: 2100 })}
-                disabled={action == "view"}
-                className="disabled:opacity-75"
               />
             </div>
-            {action !== "view" && (
-              <DialogFooter>
-                <div className="flex gap-2 items-center justify-end mt-3">
-                  <Button type="submit">{renderSubmitButton()}</Button>
-                </div>
-              </DialogFooter>
-            )}
+            <DialogFooter>
+              <div className="flex gap-2 items-center justify-end mt-3">
+                <Button type="submit">Add</Button>
+              </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
@@ -242,4 +175,4 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   );
 }
 
-export default ModifyStudent;
+export default AddStudent;

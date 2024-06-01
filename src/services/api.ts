@@ -17,7 +17,7 @@ export const createStudent = async (data: StudentData) => {
 };
 
 export const modifyStudent = async (data: StudentData) => {
-  return await axiosInstance.put("api/v1/student", data);
+  return await axiosInstance.post("api/v1/student", data);
 };
 
 export const deleteStudent = async (id: number) => {

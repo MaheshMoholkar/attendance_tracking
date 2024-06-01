@@ -76,7 +76,7 @@ const ActionButtons = (props: any) => {
       </Button>
 
       <AlertDialog>
-        <AlertDialogTrigger>
+        <AlertDialogTrigger asChild>
           <Button variant="destructive">
             <Trash />
           </Button>

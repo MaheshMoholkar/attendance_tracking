@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import ModifyStudent from "./ModifyStudent";
+
 import { StudentData } from "@/services/types";
 import { useGetStudents } from "@/services/queries";
 import StudentList from "./StudentList";
+import AddStudent from "./AddStudent";
 
 function Student() {
   const [studentList, setStudentList] = useState<StudentData[]>([]);
@@ -15,7 +16,7 @@ function Student() {
     <div className="p-7">
       <h2 className="font-bold text-2xl flex justify-between items-center text-gray-700">
         Students
-        <ModifyStudent />
+        <AddStudent />
       </h2>
       <StudentList studentList={studentList} />
     </div>
