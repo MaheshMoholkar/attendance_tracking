@@ -5,10 +5,10 @@ import SideNav from "./SideNav";
 function Home() {
   return (
     <div>
-      <div className="md:w-64 fixed hidden md:block">
+      <div className="md:w-64 fixed h-screen hidden md:block">
         <SideNav />
       </div>
-      <div className="md:ml-64">
+      <div className="md:ml-64 p-3">
         <Header />
         <Outlet />
       </div>

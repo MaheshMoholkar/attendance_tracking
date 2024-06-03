@@ -21,7 +21,7 @@ function MonthSelector({ setSelectedMonth }: MonthSelectorProps) {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="flex gap-2 items-center text-slate-500"
+              className="flex gap-2 items-center text-slate-700"
             >
               <CalendarDays className="h-5 w-5" />
               {moment(month).format("MMM YYYY")}

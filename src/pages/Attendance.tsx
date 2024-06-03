@@ -53,9 +53,11 @@ function Attendance() {
 
   return (
     <>
-      <div className="px-10 mt-2">
-        <h2 className="text-2xl font-bold">Attendance</h2>
-        <div className="flex gap-4 items-center my-3 border rounded-lg shadow-sm p-3">
+      <div className="mt-7">
+        <h2 className="font-bold text-2xl flex justify-between items-center text-gray-700">
+          Attendance
+        </h2>
+        <div className="flex gap-4 items-center my-3 border rounded-lg shadow-sm p-3 bg-white">
           <label>Select Month:</label>
           <MonthSelector setSelectedMonth={setSelectedMonth} />
           <ClassSelector

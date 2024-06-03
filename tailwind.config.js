@@ -24,7 +24,7 @@ module.exports = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1c7ed6",
+          DEFAULT: "#475569",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -70,6 +70,9 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+      },
+      height: {
+        'side-bar-h': 'calc(100% - 20px)',
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

@@ -156,16 +156,16 @@ function StudentList({ studentList }: StudentListProps) {
     <>
       <div className="mt-4 ag-theme-quartz h-[500px]">
         <div className="flex gap-2">
-          <div className="p-2 rounded-lg border shadow-sm flex gap-2 mb-3 max-w-sm">
+          <div className="p-2 rounded-lg border shadow-sm flex gap-2 mb-3 max-w-sm bg-white">
             <Search />
             <input
               type="text"
               placeholder="Search"
-              className="outline-none w-full"
+              className="outline-none w-full bg-transparent"
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <div className="flex mb-3 px-8 border border-gray-300 rounded-lg p-2 text-gray-600 font-bold text-lg ">
+          <div className="flex mb-3 px-8 border border-gray-300 rounded-lg p-2 text-gray-600 font-bold text-lg bg-white">
             {studentList && studentList.length != 0
               ? `Total Students: ${studentList.length}`
               : "No Students"}

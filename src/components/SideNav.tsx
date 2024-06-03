@@ -31,19 +31,18 @@ function SideNav() {
   ];
   return (
     <>
-      <div className="border shadow-md h-screen p-5">
-        <div className="flex">
-          <img src="./src/assets/logo.svg" alt="logo" height={40} width={40} />
-          <p className="flex items-center font-bold ml-6 text-slate-700 text-lg leading-tight">
-            Attendance Management
-          </p>
+      <div className="border shadow-md h-side-bar-h p-3 bg-slate-600 m-2 rounded-lg">
+        <div className="flex border rounded-lg p-5 bg-white">
+          <img src="./src/assets/erp-logo.png" alt="logo" />
         </div>
         <hr className="my-5" />
         {menuList.map((menu, index) => (
           <Link
             to={menu.path}
-            className={`flex items-center gap-3 text-md p-4 text-slate-500 border-2 border-white hover:border-blue-600 cursor-pointer rounded-lg my-2 ${
-              location.pathname == menu.path && "bg-primary text-white"
+            className={`flex items-center gap-3 text-lg p-3 hover:text-slate-600 hover:bg-white  cursor-pointer rounded-lg my-2 transition-colors duration-300 ${
+              location.pathname == menu.path
+                ? "bg-white text-slate-600"
+                : "text-white"
             }`}
             key={index}
           >
@@ -51,12 +50,6 @@ function SideNav() {
             {menu.name}
           </Link>
         ))}
-        <div className="flex gap-2 items-center bottom-5 fixed">
-          <h2 className="flex items-center text-md p-4 text-slate-500 hover:bg-blue-600  hover:text-white cursor-pointer rounded-lg my-2">
-            <User />
-            <p className="ml-3">Mahesh Moholkar</p>
-          </h2>
-        </div>
       </div>
     </>
   );

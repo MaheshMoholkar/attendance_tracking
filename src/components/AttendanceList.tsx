@@ -35,15 +35,16 @@ function AttendanceList({ selectedMonth, selectedYear }: AttendanceListProps) {
     const numberOfDays = daysInMonth(selectedYear, selectedMonth);
 
     // Generate new column definitions
-    const newColDefs: ColDef[] = [
-      { field: "name", width: 100 },
-      { field: "present", width: 100, editable: true },
-    ];
+    const newColDefs: ColDef[] = [{ field: "name", width: 100 }];
     for (let day = 1; day <= numberOfDays; day++) {
       newColDefs.push({
         field: `${day}`,
         width: 60,
         editable: true,
+        sortable: false,
+        cellStyle: () => {
+          return { borderColor: "transparent" };
+        },
       });
     }
 
