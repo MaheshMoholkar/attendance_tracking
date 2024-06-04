@@ -3,12 +3,15 @@ import ClassSelector from "../components/ClassSelector";
 import MonthSelector from "../components/MonthSelector";
 import { Button } from "../components/ui/button";
 import { useGetClassInfo } from "@/services/queries";
-import { ClassInfo } from "@/services/types";
+import { ClassDivisions } from "@/services/types";
 import AttendanceList from "../components/AttendanceList";
 import moment from "moment/moment";
 
 function Attendance() {
-  const [classes, setClasses] = useState<ClassInfo[]>([]);
+  const [classes, setClasses] = useState<ClassDivisions>({
+    ClassNames: [],
+    Divisions: {},
+  });
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedDivision, setSelectedDivision] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -16,32 +19,30 @@ function Attendance() {
     moment(selectedMonth).format("MM")
   );
 
-  const [divisions, setDivisions] = useState<string[]>([]);
   const getClassesQuery = useGetClassInfo();
 
   useEffect(() => {
     if (getClassesQuery.data) {
       setClasses(getClassesQuery.data);
-      if (getClassesQuery.data.length > 0) {
-        setSelectedClass(getClassesQuery.data[0].className);
+      const classNames = getClassesQuery.data.ClassNames;
+      if (classNames.length > 0) {
+        setSelectedClass(classNames[0]);
       }
     }
   }, [getClassesQuery.data]);
 
   useEffect(() => {
-    const selectedClassInfo = classes.find(
-      (cls) => cls.className === selectedClass
-    );
-    if (selectedClassInfo) {
-      setDivisions(Object.keys(selectedClassInfo.divisions));
-    } else {
-      setDivisions([]);
-    }
+    const selectedClassDivisions = classes.Divisions[selectedClass] || [];
+    setSelectedDivision(selectedClassDivisions[0] || "");
   }, [selectedClass, classes]);
 
   const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedClass(event.target.value);
+    const selectedClass = event.target.value;
+    setSelectedClass(selectedClass);
+    const selectedClassDivisions = classes.Divisions[selectedClass] || [];
+    setSelectedDivision(selectedClassDivisions[0] || "");
   };
+
   const handleDivisionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedDivision(event.target.value);
   };
@@ -64,7 +65,6 @@ function Attendance() {
             selectedClass={selectedClass}
             selectedDivision={selectedDivision}
             classes={classes}
-            divisions={divisions}
             handleClassChange={handleClassChange}
             handleDivisionChange={handleDivisionChange}
           />

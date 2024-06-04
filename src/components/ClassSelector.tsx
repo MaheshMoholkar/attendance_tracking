@@ -1,22 +1,24 @@
-import { ClassInfo } from "@/services/types";
 import { ChangeEvent } from "react";
+import { ClassDivisions } from "@/services/types";
 
 type ClassSelectorProps = {
   selectedClass: string;
   selectedDivision: string;
   handleClassChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   handleDivisionChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-  classes: ClassInfo[];
-  divisions: string[];
+  classes: ClassDivisions;
 };
+
 function ClassSelector({
   selectedClass,
   selectedDivision,
   handleClassChange,
   handleDivisionChange,
   classes,
-  divisions,
 }: ClassSelectorProps) {
+  const { ClassNames, Divisions } = classes;
+  const selectedClassDivisions = Divisions[selectedClass] || [];
+
   return (
     <>
       <div className="flex items-center gap-2">
@@ -26,9 +28,9 @@ function ClassSelector({
           value={selectedClass}
           onChange={handleClassChange}
         >
-          {classes.map((value, index) => (
-            <option key={index} value={value.className}>
-              {value.className.toUpperCase()}
+          {ClassNames.map((className) => (
+            <option key={className} value={className}>
+              {className.toUpperCase()}
             </option>
           ))}
         </select>
@@ -38,8 +40,10 @@ function ClassSelector({
           value={selectedDivision}
           onChange={handleDivisionChange}
         >
-          {divisions.map((division, index) => (
-            <option key={index}>{division.toUpperCase()}</option>
+          {selectedClassDivisions.map((division) => (
+            <option key={division} value={division}>
+              {division.toUpperCase()}
+            </option>
           ))}
         </select>
       </div>

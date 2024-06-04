@@ -1,4 +1,4 @@
-import { GraduationCap, Hand, LayoutIcon, Settings, User } from "lucide-react";
+import { GraduationCap, Hand, LayoutIcon, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 function SideNav() {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -28,11 +28,11 @@ function AttendanceList({ selectedMonth, selectedYear }: AttendanceListProps) {
   ]);
 
   const daysInMonth = (year: number, month: number) => {
-    return new Date(year, month, 0).getDate(); // Correct month calculation
+    return new Date(year, month + 1, 0).getDate(); // Correct month calculation
   };
 
   useEffect(() => {
-    const numberOfDays = daysInMonth(selectedYear, selectedMonth);
+    const numberOfDays = daysInMonth(selectedYear, selectedMonth - 1);
 
     // Generate new column definitions
     const newColDefs: ColDef[] = [{ field: "name", width: 100 }];
@@ -57,10 +57,10 @@ function AttendanceList({ selectedMonth, selectedYear }: AttendanceListProps) {
       }
       return prevColDefs;
     });
-  }, [selectedMonth, selectedYear, attendance]);
+  }, [selectedMonth, selectedYear]);
 
   return (
-    <div className="mt-4 ag-theme-alpine h-[500px]">
+    <div className="mt-4 ag-theme-alpine h-[530px]">
       <AgGridReact rowData={rowData} columnDefs={colDefs}></AgGridReact>
     </div>
   );

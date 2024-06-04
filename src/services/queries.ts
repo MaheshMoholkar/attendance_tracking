@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getClassInfo, getStudents } from "./api";
+import { getClassDivisions, getStudents } from "./api";
 
 export function useGetStudents() {
   return useQuery({
@@ -11,8 +11,8 @@ export function useGetStudents() {
 
 export function useGetClassInfo() {
   return useQuery({
-    queryKey: ["class-info"],
-    queryFn: getClassInfo,
+    queryKey: ["class-divisions"],
+    queryFn: getClassDivisions,
     refetchOnWindowFocus: false,
   });
 }

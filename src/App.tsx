@@ -8,7 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Attendance from "./pages/Attendance";
 import Login from "./pages/Login";
 import theme from "./config/AppTheme";
-import Loader from "./components/Loader";
+import Settings from "./pages/Settings";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +18,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <Dashboard /> },
       { path: "students", element: <Student /> },
       { path: "attendance", element: <Attendance /> },
+      { path: "settings", element: <Settings /> },
     ],
   },
   { path: "login", element: <Login /> },
@@ -26,7 +27,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
-      <Loader />
     </ThemeProvider>
   );
 }

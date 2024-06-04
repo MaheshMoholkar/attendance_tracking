@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ClassInfo, StudentData } from "../services/types";
-import { useCreateStudent, useModifyStudent } from "../services/mutations";
+import { ClassDivisions, StudentData } from "@/services/types";
+import { useCreateStudent, useModifyStudent } from "@/services/mutations";
 import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -14,17 +14,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useGetClassInfo } from "@/services/queries";
+import { DisplayData } from "./StudentList";
 
 type ActionType = "view" | "modify" | undefined;
 
 type ModifyStudentProps = {
   action?: ActionType;
-  studentData?: StudentData;
-  onClose?: () => void | void;
+  studentData?: DisplayData;
+  onClose?: () => void;
 };
 
 function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
-  const [classInfo, setClassInfo] = useState<ClassInfo[]>();
+  const [classInfo, setClassInfo] = useState<ClassDivisions>({
+    ClassNames: [],
+    Divisions: {},
+  });
   const [selectedClass, setSelectedClass] = useState<string | undefined>(
     studentData?.className
   );
@@ -49,11 +53,14 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   } = useForm<StudentData>({ defaultValues: studentData });
 
   useEffect(() => {
-    setClassInfo(getClassInfoQuery.data);
-  });
+    if (getClassInfoQuery.data) {
+      setClassInfo(getClassInfoQuery.data);
+    }
+  }, [getClassInfoQuery.data]);
 
   const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedClass(event.target.value);
+    const selectedClass = event.target.value;
+    setSelectedClass(selectedClass);
     setSelectedDivision(undefined);
   };
 
@@ -69,8 +76,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
     };
     if (action === "modify") {
       modifyStudentMutation.mutate(data, {
-        onSuccess: (data) => {
-          console.log(data);
+        onSuccess: () => {
           onClose && onClose();
           reset();
           toast("Student Details Updated");
@@ -86,19 +92,22 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
       });
     }
   };
+
   const firstName = watch("firstName");
   const lastName = watch("lastName");
   const email = watch("email");
   const className = watch("className");
-  const year = watch("year") | new Date().getFullYear();
+  const division = watch("division");
+  const year = watch("year") || new Date().getFullYear();
 
   useEffect(() => {
     setValue("firstName", firstName?.trim());
     setValue("lastName", lastName?.trim());
     setValue("email", email?.trim());
     setSelectedClass(className);
+    setSelectedDivision(division);
     setValue("year", year);
-  }, [firstName, lastName, email, setValue]);
+  }, [firstName, lastName, email, division, className, setValue]);
 
   const renderSubmitButton = () => {
     switch (action) {
@@ -132,6 +141,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
+
   return (
     <div>
       <Dialog {...dialogProps}>
@@ -147,12 +157,20 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="gap-2 flex flex-col ">
+            <div className="gap-2 flex flex-col">
+              <label>Student ID</label>
+              <Input
+                {...register("student_id", { required: true })}
+                disabled
+                className="disabled:opacity-75"
+              />
+            </div>
+            <div className="gap-2 flex flex-col">
               <label>First Name</label>
               <Input
                 placeholder="John"
                 {...register("firstName", { required: true })}
-                disabled={action == "view"}
+                disabled={action === "view"}
                 className="disabled:opacity-75"
               />
             </div>
@@ -161,7 +179,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <Input
                 placeholder="Doe"
                 {...register("lastName", { required: true })}
-                disabled={action == "view"}
+                disabled={action === "view"}
                 className="disabled:opacity-75"
               />
             </div>
@@ -169,7 +187,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <label>Rollno</label>
               <Input
                 {...register("rollno", { required: true })}
-                disabled={action == "view"}
+                disabled={action === "view"}
                 className="disabled:opacity-75"
               />
             </div>
@@ -178,7 +196,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <Input
                 placeholder="example@gmail.com"
                 {...register("email")}
-                disabled={action == "view"}
+                disabled={action === "view"}
                 className="disabled:opacity-75"
               />
             </div>
@@ -188,11 +206,11 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
                 className="p-3 border rounded-lg disabled:opacity-75"
                 {...register("className", { required: true })}
                 onChange={handleClassChange}
-                disabled={action == "view"}
+                disabled={action === "view"}
               >
-                {classInfo?.map((data) => (
-                  <option key={data.className} value={data.className}>
-                    {data.className.toUpperCase()}
+                {classInfo.ClassNames.map((className) => (
+                  <option key={className} value={className}>
+                    {className.toUpperCase()}
                   </option>
                 ))}
               </select>
@@ -204,27 +222,23 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
                 {...register("division", { required: true })}
                 onChange={handleDivisionChange}
                 value={selectedDivision}
-                disabled={action == "view"}
+                disabled={action === "view"}
               >
                 {selectedClass &&
-                  classInfo?.find((data) => data.className === selectedClass)
-                    ?.divisions &&
-                  Object.keys(
-                    classInfo?.find((data) => data.className === selectedClass)
-                      ?.divisions || {}
-                  ).map((division) => (
+                  classInfo.Divisions[selectedClass]?.map((division) => (
                     <option key={division} value={division}>
                       {division.toUpperCase()}
                     </option>
                   ))}
               </select>
             </div>
+
             <div className="py-1 gap-1 flex flex-col">
               <label>Year</label>
               <Input
                 type="number"
                 {...register("year", { required: true, min: 2000, max: 2100 })}
-                disabled={action == "view"}
+                disabled={action === "view"}
                 className="disabled:opacity-75"
               />
             </div>

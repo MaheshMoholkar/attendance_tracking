@@ -1,4 +1,5 @@
 export type StudentData = {
+  id: number;
   firstName: string;
   lastName: string;
   rollno: number;
@@ -6,14 +7,12 @@ export type StudentData = {
   className: string;
   division: string;
   year: number;
+  student_id: number;
 };
 
-export type ClassData = {
-  id: number;
-  className: string;
-};
-
-export type ClassInfo = {
-  className: string;
-  divisions: { [division: string]: boolean };
+export type ClassDivisions = {
+  ClassNames: string[];
+  Divisions: {
+    [key: string]: string[];
+  };
 };
