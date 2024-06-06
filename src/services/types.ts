@@ -16,3 +16,14 @@ export type ClassDivisions = {
     [key: string]: string[];
   };
 };
+
+export type AttendanceData = {
+  student_id: number;
+  attendance: { [key: number]: boolean };
+};
+
+export interface AttendanceParams {
+  className: string;
+  divisionName: string;
+  date: string;
+}

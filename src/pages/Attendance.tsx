@@ -3,9 +3,12 @@ import ClassSelector from "../components/ClassSelector";
 import MonthSelector from "../components/MonthSelector";
 import { Button } from "../components/ui/button";
 import { useGetClassInfo } from "@/services/queries";
-import { ClassDivisions } from "@/services/types";
+import { AttendanceData, ClassDivisions } from "@/services/types";
 import AttendanceList from "../components/AttendanceList";
 import moment from "moment/moment";
+import { useGetAttendanceList } from "@/services/mutations";
+import { toast } from "sonner";
+import { AxiosResponse } from "axios";
 
 function Attendance() {
   const [classes, setClasses] = useState<ClassDivisions>({
@@ -18,8 +21,10 @@ function Attendance() {
   const [month, setMonth] = useState<string>(
     moment(selectedMonth).format("MM")
   );
+  const [attendanceData, setAttendanceData] = useState<AttendanceData[]>([]);
 
   const getClassesQuery = useGetClassInfo();
+  const getAttendanceListMutation = useGetAttendanceList();
 
   useEffect(() => {
     if (getClassesQuery.data) {
@@ -48,8 +53,22 @@ function Attendance() {
   };
 
   const handleSearch = () => {
-    const month = moment(selectedMonth).format("MM");
+    const month = moment(selectedMonth).format("YYYY-MM");
     setMonth(month);
+    getAttendanceListMutation.mutate(
+      {
+        className: selectedClass,
+        divisionName: selectedDivision,
+        date: month,
+      },
+      {
+        onSuccess: (response: AxiosResponse) => {
+          const data: AttendanceData[] = response.data;
+          setAttendanceData(data);
+          toast("Attendance Fetched!");
+        },
+      }
+    );
   };
 
   return (
@@ -71,7 +90,11 @@ function Attendance() {
           <Button onClick={handleSearch}>Search</Button>
         </div>
         <div>
-          <AttendanceList selectedMonth={parseInt(month)} selectedYear={2024} />
+          <AttendanceList
+            selectedMonth={parseInt(month)}
+            selectedYear={new Date().getFullYear()}
+            attendanceData={attendanceData}
+          />
         </div>
       </div>
     </>

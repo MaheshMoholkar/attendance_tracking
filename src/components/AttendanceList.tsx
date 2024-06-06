@@ -3,65 +3,72 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ColDef } from "ag-grid-community";
-
-type AttendanceData = {
-  name: string;
-  [key: string]: any; // Allow dynamic properties
-};
+import { AttendanceData } from "@/services/types";
+import { useSaveAttendance } from "@/services/mutations";
+import { toast } from "sonner";
+import { Button } from "../components/ui/button";
 
 type AttendanceListProps = {
+  attendanceData: AttendanceData[];
   selectedMonth: number;
   selectedYear: number;
 };
 
-function AttendanceList({ selectedMonth, selectedYear }: AttendanceListProps) {
-  const attendance: AttendanceData[] = [
-    { name: "mahesh", present: true },
-    { name: "santosh", present: true },
-    { name: "vaibhav", present: true },
-  ];
-
-  const [rowData, setRowData] = useState<AttendanceData[]>(attendance);
+function AttendanceList({
+  attendanceData,
+  selectedMonth,
+  selectedYear,
+}: AttendanceListProps) {
+  const [rowData, setRowData] = useState<AttendanceData[]>([]);
   const [colDefs, setColDefs] = useState<ColDef[]>([
-    { field: "name", width: 100 },
-    { field: "present", width: 100, editable: true },
+    { field: "student_id", headerName: "Student ID", width: 120 },
   ]);
+  const saveAttendanceMutation = useSaveAttendance();
 
   const daysInMonth = (year: number, month: number) => {
-    return new Date(year, month + 1, 0).getDate(); // Correct month calculation
+    return new Date(year, month + 1, 0).getDate();
   };
 
   useEffect(() => {
     const numberOfDays = daysInMonth(selectedYear, selectedMonth - 1);
 
-    // Generate new column definitions
-    const newColDefs: ColDef[] = [{ field: "name", width: 100 }];
+    const filteredData = attendanceData.filter(() => {});
+
+    const newColDefs: ColDef[] = [
+      { field: "student_id", headerName: "Student ID", width: 120 },
+    ];
     for (let day = 1; day <= numberOfDays; day++) {
       newColDefs.push({
-        field: `${day}`,
+        field: day.toString(),
+        headerName: day.toString(),
         width: 60,
         editable: true,
-        sortable: false,
-        cellStyle: () => {
-          return { borderColor: "transparent" };
-        },
       });
     }
 
-    // Update state only if the new column definitions differ from the current ones
-    setColDefs((prevColDefs) => {
-      const prevColsString = JSON.stringify(prevColDefs);
-      const newColsString = JSON.stringify(newColDefs);
-      if (prevColsString !== newColsString) {
-        return newColDefs;
-      }
-      return prevColDefs;
+    setColDefs(newColDefs);
+    setRowData(filteredData);
+  }, [selectedMonth, selectedYear, attendanceData]);
+
+  const handleSave = () => {
+    saveAttendanceMutation.mutate(rowData, {
+      onSuccess: () => {
+        toast("Attendance updated successfully!");
+      },
+      onError: () => {
+        toast.error("Failed to update attendance.");
+      },
     });
-  }, [selectedMonth, selectedYear]);
+  };
 
   return (
-    <div className="mt-4 ag-theme-alpine h-[530px]">
-      <AgGridReact rowData={rowData} columnDefs={colDefs}></AgGridReact>
+    <div className="mt-4">
+      <div className="ag-theme-alpine h-[530px]">
+        <AgGridReact rowData={rowData} columnDefs={colDefs}></AgGridReact>
+      </div>
+      <div className="flex justify-end mt-2">
+        <Button onClick={handleSave}>Save Attendance</Button>
+      </div>
     </div>
   );
 }

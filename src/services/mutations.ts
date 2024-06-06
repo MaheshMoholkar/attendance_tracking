@@ -1,6 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createStudent, deleteStudent, modifyStudent } from "./api";
-import { StudentData } from "./types";
+import {
+  createStudent,
+  deleteStudent,
+  getAttendanceList,
+  modifyStudent,
+  saveAttendance,
+} from "./api";
+import { AttendanceData, AttendanceParams, StudentData } from "./types";
+import { toast } from "sonner";
 
 export function useCreateStudent() {
   const queryClient = useQueryClient();
@@ -28,6 +35,24 @@ export function useDeleteStudent() {
     mutationFn: (id: number) => deleteStudent(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["students"] });
+    },
+  });
+}
+
+export function useGetAttendanceList() {
+  return useMutation({
+    mutationFn: (params: AttendanceParams) => getAttendanceList(params),
+    onSuccess: async () => {
+      toast("Attendance List Fetched!");
+    },
+  });
+}
+
+export function useSaveAttendance() {
+  return useMutation({
+    mutationFn: (data: AttendanceData[]) => saveAttendance(data),
+    onSuccess: async () => {
+      toast("Attendance Saved!");
     },
   });
 }

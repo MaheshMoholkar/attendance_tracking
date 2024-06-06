@@ -59,7 +59,7 @@ function AddStudent() {
       ...data,
       rollno: parseInt(data.rollno.toString(), 10),
       year: parseInt(data.year.toString(), 10),
-      studentID: parseInt(data.studentID.toString(), 10),
+      student_id: parseInt(data.student_id.toString(), 10),
     };
 
     createStudentMutation.mutate(data, {
@@ -113,6 +113,10 @@ function AddStudent() {
             <DialogTitle>Enter Student Details</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="gap-2 flex flex-col">
+              <label>Student ID</label>
+              <Input {...register("student_id", { required: true })} />
+            </div>
             <div className="gap-2 flex flex-col ">
               <label>First Name</label>
               <Input

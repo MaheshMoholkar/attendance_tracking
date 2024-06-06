@@ -58,25 +58,17 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
     }
   }, [getClassInfoQuery.data]);
 
-  const handleClassChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedClass = event.target.value;
-    setSelectedClass(selectedClass);
-    setSelectedDivision(undefined);
-  };
-
-  const handleDivisionChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDivision(event.target.value);
-  };
-
   const onSubmit = (data: StudentData) => {
     data = {
       ...data,
       rollno: parseInt(data.rollno.toString(), 10),
       year: parseInt(data.year.toString(), 10),
     };
+    console.log(data);
     if (action === "modify") {
       modifyStudentMutation.mutate(data, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          console.log(data);
           onClose && onClose();
           reset();
           toast("Student Details Updated");
@@ -205,7 +197,7 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <select
                 className="p-3 border rounded-lg disabled:opacity-75"
                 {...register("className", { required: true })}
-                onChange={handleClassChange}
+                value={selectedClass}
                 disabled={action === "view"}
               >
                 {classInfo.ClassNames.map((className) => (
@@ -220,7 +212,6 @@ function ModifyStudent({ action, studentData, onClose }: ModifyStudentProps) {
               <select
                 className="p-3 border rounded-lg disabled:opacity-75"
                 {...register("division", { required: true })}
-                onChange={handleDivisionChange}
                 value={selectedDivision}
                 disabled={action === "view"}
               >
