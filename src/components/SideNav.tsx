@@ -39,9 +39,9 @@ function SideNav() {
         {menuList.map((menu, index) => (
           <Link
             to={menu.path}
-            className={`flex items-center gap-3 text-lg p-3 hover:text-slate-600 hover:bg-white  cursor-pointer rounded-lg my-2 transition-colors duration-300 ${
+            className={`flex items-center gap-3 text-lg p-3  hover:bg-slate-700 hover:text-white cursor-pointer rounded-lg my-2 transition-colors duration-300 ${
               location.pathname == menu.path
-                ? "bg-white text-slate-600"
+                ? "bg-white text-slate-700"
                 : "text-white"
             }`}
             key={index}
