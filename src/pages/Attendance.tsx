@@ -3,7 +3,11 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ColDef } from "ag-grid-community";
-import { AttendanceData, ClassDivisions } from "@/services/types";
+import {
+  AttendanceData,
+  ClassDivisions,
+  SaveAttendancePayload,
+} from "@/services/types";
 import ClassSelector from "../components/ClassSelector";
 import MonthSelector from "../components/MonthSelector";
 import { Button } from "../components/ui/button";
@@ -12,7 +16,7 @@ import { useGetAttendanceList, useSaveAttendance } from "@/services/mutations";
 import { toast } from "sonner";
 import moment from "moment";
 import { AxiosResponse } from "axios";
-import { Check, X } from "lucide-react";
+import { Check, Minus, X } from "lucide-react";
 
 function Attendance() {
   const [classes, setClasses] = useState<ClassDivisions>({
@@ -22,6 +26,7 @@ function Attendance() {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedDivision, setSelectedDivision] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [subjectName, setSubjectName] = useState("");
   const [attendanceData, setAttendanceData] = useState<AttendanceData[]>([]);
   const [rowData, setRowData] = useState<AttendanceData[]>([]);
   const [colDefs, setColDefs] = useState<ColDef[]>([
@@ -59,12 +64,13 @@ function Attendance() {
   };
 
   const handleSearch = () => {
-    const month = moment(selectedMonth).format("YYYY-MM");
+    const month = moment(selectedMonth).format("MM_YYYY");
     getAttendanceListMutation.mutate(
       {
         className: selectedClass,
         divisionName: selectedDivision,
-        date: month,
+        monthYear: month,
+        subject: "ot",
       },
       {
         onSuccess: (response: AxiosResponse) => {
@@ -77,8 +83,15 @@ function Attendance() {
   };
 
   const handleSave = () => {
-    console.log(attendanceData);
-    saveAttendanceMutation.mutate(rowData, {
+    const month = moment(selectedMonth).format("MM_YYYY");
+    const payload: SaveAttendancePayload = {
+      rowData,
+      className: selectedClass,
+      divisionName: selectedDivision,
+      monthYear: month,
+      subject: "ot",
+    };
+    saveAttendanceMutation.mutate(payload, {
       onSuccess: () => {
         toast("Attendance updated successfully!");
       },
@@ -132,9 +145,12 @@ function Attendance() {
           <Button
             variant="ghost"
             className={
-              params.data.attendance[params.colDef.headerName]
-                ? "bg-green-200"
-                : "bg-red-200"
+              params.data.attendance[params.colDef.headerName] == true ||
+              params.data.attendance[params.colDef.headerName] == false
+                ? params.data.attendance[params.colDef.headerName] == true
+                  ? "bg-green-200 hover:text-green-600"
+                  : "bg-red-200 hover:text-red-600"
+                : "bg-white hover:bg-slate-200"
             }
             onClick={() => {
               const updatedAttendance = {
@@ -145,10 +161,15 @@ function Attendance() {
               updateAttendance(params.data.student_id, updatedAttendance);
             }}
           >
-            {params.data.attendance[params.colDef.headerName] ? (
-              <Check />
+            {params.data.attendance[params.colDef.headerName] == true ||
+            params.data.attendance[params.colDef.headerName] == false ? (
+              params.data.attendance[params.colDef.headerName] == true ? (
+                <Check />
+              ) : (
+                <X />
+              )
             ) : (
-              <X />
+              <Minus />
             )}
           </Button>
         ),

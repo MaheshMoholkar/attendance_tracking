@@ -6,7 +6,7 @@ import {
   modifyStudent,
   saveAttendance,
 } from "./api";
-import { AttendanceData, AttendanceParams, StudentData } from "./types";
+import { AttendanceParams, SaveAttendancePayload, StudentData } from "./types";
 import { toast } from "sonner";
 
 export function useCreateStudent() {
@@ -50,7 +50,7 @@ export function useGetAttendanceList() {
 
 export function useSaveAttendance() {
   return useMutation({
-    mutationFn: (data: AttendanceData[]) => saveAttendance(data),
+    mutationFn: (data: SaveAttendancePayload) => saveAttendance(data),
     onSuccess: async () => {
       toast("Attendance Saved!");
     },

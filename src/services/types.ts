@@ -17,13 +17,26 @@ export type ClassDivisions = {
   };
 };
 
+export type AttendanceRecord = {
+  [day: string]: boolean;
+};
+
 export type AttendanceData = {
   student_id: number;
-  attendance: { [key: number]: boolean };
+  attendance: AttendanceRecord;
 };
 
 export interface AttendanceParams {
   className: string;
   divisionName: string;
-  date: string;
+  monthYear: string;
+  subject: string;
 }
+
+export type SaveAttendancePayload = {
+  rowData: AttendanceData[];
+  className: string;
+  divisionName: string;
+  monthYear: string;
+  subject: string;
+};
