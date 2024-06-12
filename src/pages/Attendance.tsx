@@ -7,11 +7,12 @@ import {
   AttendanceData,
   ClassDivisions,
   SaveAttendancePayload,
+  Subject,
 } from "@/services/types";
 import ClassSelector from "../components/ClassSelector";
 import MonthSelector from "../components/MonthSelector";
 import { Button } from "../components/ui/button";
-import { useGetClassInfo } from "@/services/queries";
+import { useGetClassInfo, useGetSubjects } from "@/services/queries";
 import { useGetAttendanceList, useSaveAttendance } from "@/services/mutations";
 import { toast } from "sonner";
 import moment from "moment";
@@ -23,10 +24,11 @@ function Attendance() {
     ClassNames: [],
     Divisions: {},
   });
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedDivision, setSelectedDivision] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [subjectName, setSubjectName] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
   const [attendanceData, setAttendanceData] = useState<AttendanceData[]>([]);
   const [rowData, setRowData] = useState<AttendanceData[]>([]);
   const [colDefs, setColDefs] = useState<ColDef[]>([
@@ -36,6 +38,7 @@ function Attendance() {
   const getClassesQuery = useGetClassInfo();
   const getAttendanceListMutation = useGetAttendanceList();
   const saveAttendanceMutation = useSaveAttendance();
+  const getSubjectQuery = useGetSubjects();
 
   useEffect(() => {
     if (getClassesQuery.data) {
@@ -45,7 +48,10 @@ function Attendance() {
         setSelectedClass(classNames[0]);
       }
     }
-  }, [getClassesQuery.data]);
+    if (getSubjectQuery.data) {
+      setSubjects(getSubjectQuery.data);
+    }
+  }, [getClassesQuery.data, getSubjectQuery.data]);
 
   useEffect(() => {
     const selectedClassDivisions = classes.Divisions[selectedClass] || [];
@@ -61,6 +67,9 @@ function Attendance() {
 
   const handleDivisionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedDivision(event.target.value);
+  };
+  const handleSubjectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubject(event.target.value);
   };
 
   const handleSearch = () => {
@@ -196,6 +205,9 @@ function Attendance() {
               classes={classes}
               handleClassChange={handleClassChange}
               handleDivisionChange={handleDivisionChange}
+              selectedSubject={selectedSubject}
+              handleSubjectChange={handleSubjectChange}
+              subjects={subjects}
             />
             <Button onClick={handleSearch}>Search</Button>
           </div>

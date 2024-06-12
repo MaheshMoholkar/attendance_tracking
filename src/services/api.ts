@@ -8,6 +8,10 @@ export const getClassDivisions = async () => {
   return (await axiosInstance.get("api/v1/class-divisions")).data;
 };
 
+export const getSubjects = async () => {
+  return (await axiosInstance.get("api/v1/subject")).data;
+};
+
 export const getStudents = async () => {
   return (await axiosInstance.get("api/v1/students")).data;
 };

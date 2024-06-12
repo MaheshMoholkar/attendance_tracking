@@ -17,6 +17,12 @@ export type ClassDivisions = {
   };
 };
 
+export type Subject = {
+  SubjectID: number;
+  Subjectname: string;
+  ClassID: number;
+};
+
 export type AttendanceRecord = {
   [day: string]: boolean;
 };
